@@ -1,0 +1,168 @@
+{% load admin_static i18n %}{% load url from future %}<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE|default:"en-us" }}" {% if LANGUAGE_BIDI %}dir="rtl"{% endif %}
+      xmlns="http://www.w3.org/1999/html">
+<head>
+    <title>{% block title %}{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Área administrativa do site">
+    <meta name="author" content="JWG | Soluções para Internet">
+    <link rel="stylesheet" type="text/css"
+          href="{% block stylesheet %}{% static "admin/css/bootstrap-custum.css" %}{% endblock %}"/>
+    <link rel="stylesheet" type="text/css" href="{% static "admin/css/bootstrap-responsive.css" %}"/>
+    <link rel="stylesheet" type="text/css" href="{% static "admin/css/custom_admin.css" %}"/>
+    {% block extrastyle %}{% endblock %}
+    <!--[if lte IE 7]><link rel="stylesheet" type="text/css" href="{% block stylesheet_ie %}{% endblock %}" />
+    <![endif]-->
+    <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+<![endif]-->
+    {#{% if LANGUAGE_BIDI %}<link rel="stylesheet" type="text/css" href="{% block stylesheet_rtl %}{% static "admin/css/rtl.css" %}{% endblock %}" />{% endif %}#}
+    <script type="text/javascript">window.__admin_media_prefix__ = "{% filter escapejs %}{% static "admin/" %}{% endfilter %}";</script>
+    <script src="http://code.jquery.com/jquery-latest.js"></script>
+    <script type="text/javascript" src="{% static 'admin/js/bootstrap.js' %}"></script>
+    {% block extrahead %}{% endblock %}
+    {% block blockbots %}
+        <meta name="robots" content="NONE,NOARCHIVE"/>{% endblock %}
+</head>
+
+
+<body class="{% if is_popup %}popup {% endif %}{% block bodyclass %}{% endblock %}">
+
+<!-- Container -->
+<div>
+
+    {% if not is_popup %}
+        <!-- Header -->
+        <div id="header" class="navbar navbar-inverse navbar-static-top">
+            <div class="navbar-inner">
+                <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </a>
+
+                {% block branding %}{% endblock %}
+
+                <div id="user-tools" class="nav-collapse collapse">
+                {% if user.is_active and user.is_staff %}
+                    <ul class="nav pull-right">
+                        <li class="dropdown pull-right">
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                            <i class="icon-user icon-white"></i>&nbsp;&nbsp;{% filter force_escape %}{% firstof user.first_name|title  user.username|title %}{% endfilter %}&nbsp;<b class="caret"></b></a>
+                            <ul class="dropdown-menu pull-right">
+                                {% block userlinks %}
+                                    <li>
+                                        <a href="{% url 'admin:password_change' %}" alt="{% trans 'Change password' %}">
+                                        <i class="icon-lock"></i> {% trans 'Change password' %}</a>
+                                    </li>
+                                {% endblock %}
+                                <li class="divider"></li>
+                                <li>
+                                    <a href="{% url 'admin:logout' %}" alt="{% trans 'Log out' %}">
+                                    <i class="icon-off"></i> {% trans 'Log out' %}</a>
+                                </li>
+                            </ul>
+                        </li>
+                        {% url 'django-admindocs-docroot' as docsroot %}
+                        {% if docsroot %}
+                            <li>
+                                <a href="{{ docsroot }}" alt="{% trans 'Documentation' %}">
+                                <i class="icon-file icon-white"></i> {% trans 'Docs' %}</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                {% endif %}
+                    <ul class="nav">
+                        {% block nav-left %}
+                            {% if not is_popup %}
+                                {% if all_app_list %}
+
+
+                                    {% for app in all_app_list %}
+
+                                        {% if current_app == 'admin' %}
+                                            <li class="dropdown {% if forloop.counter0 == 0 %} active {% endif %}">
+                                                {% else %}
+                                            <li class="dropdown {% if current_app == app.name %} active {% endif %}">
+                                        {% endif %}
+
+                                        <a class="dropdown-toggle" data-toggle="dropdown" href="#"> {% blocktrans with name=app.name %}{{ name }}{% endblocktrans %} &nbsp;<b class="caret"></b></a>
+                                        <ul class="dropdown-menu">
+                                            {% for model in app.models %}
+                                                <li class="dropdown-submenu">
+                                                    {% if title == model.title %}
+                                                        {{ model.name }}
+                                                    {% else %}
+                                                        <a tabindex="-1" {% if module_name|capfirst == model.name %}class="current"{% endif %} href=" {% if model.admin_url %}{{ model.admin_url }}{% else %}'#'{% endif %}">{{ model.name }}</a>
+                                                    {% endif %}
+                                                    <ul class="dropdown-menu">
+                                                        {% if model.add_url %}
+                                                            <li class="action"><a href="{{ model.add_url }}">{% trans 'Add' %}</a></li>
+                                                        {% endif %}
+                                                        {% if model.admin_url %}
+                                                            <li class="action"><a href="{{ model.admin_url }}">{% trans 'Change' %}</a></li>
+                                                        {% endif %}
+                                                    </ul>
+                                                </li>
+                                            {% endfor %}
+                                        </ul>
+                                        </li>
+                                    {% endfor %}
+
+
+                                {% endif %}
+                            {% endif %}
+                        {% endblock %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <!-- END Header -->
+    {% endif %}
+
+<!-- Content -->
+
+    <div class="row-fluid">
+        {% if not is_popup %}
+            {% block breadcrumbs %}
+                <ul class="breadcrumb">
+                    <li><a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>{% if title %}<span class="divider">/
+                        </span>{% endif %}</li>
+                    {% if title %}
+                        <li class="active">{{ title }}</li>{% endif %}
+                </ul>
+            {% endblock %}
+        {% endif %}
+        {% block messages %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %}"><button type="button" class="close" data-dismiss="alert">×</button>{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endblock messages %}
+        <div class="page-header">
+            {% block pretitle %}{% endblock %}
+            {% block content_title %}{% if title %}<h3 class="">{{ title }}</h3>{% endif %}{% endblock %}
+        </div>
+    </div>
+
+    <div id="content" class="{% block coltype %}{% endblock %}">
+
+        {% block sidebar %}{% endblock %}
+        {% block content %}
+            <div class="btn-toolbar">
+                {% block object-tools %}{% endblock %}
+            </div>
+            {{ content }}
+        {% endblock %}
+
+        <div class="clearfix"/>
+    </div>
+    <!-- END Content -->
+    {% block footer %}
+        <div id="footer"></div>
+    {% endblock %}
+    <!-- END Container -->
+</div>
+</body>
+</html>

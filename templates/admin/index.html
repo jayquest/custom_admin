@@ -1,0 +1,172 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_static my_log log dashboard%}
+
+{% block extrastyle %}{{ block.super }}{% endblock %}
+
+{% block coltype %}{% endblock %}
+
+{% block bodyclass %}dashboard{% endblock %}
+
+{% block breadcrumbs %}{% endblock %}
+
+
+
+{% block content %}
+{#<div id="content-main" class="row-fluid">#}
+{#<div class="span">#}
+
+    {% get_dashboards as dashboards %}
+
+    {% if app_list and not dashboards %}
+        {% for app in app_list %}
+            {% for model in app.models %}
+                {% my_get_admin_log 10 as model_log for_model model %}
+                {% if model_log %}
+                    <div class="module span4">
+                        <table summary="{% blocktrans with name=app.name %}Last changes on {{ name }} application.{% endblocktrans %}"
+                               class="table table-striped table-bordered">
+                            <thead>
+                            <tr>
+                                <th class="alignCenter" colspan="3">
+                                    <span href="#"><i class="icon-folder-open"></i>
+                                        {% blocktrans with name=app.name %}{{ name }}{% endblocktrans %}</span> -
+                                    {% if model.admin_url %}
+                                        <a href="{{ model.admin_url }}">{{ model.name }}</a>
+                                    {% else %}
+                                        {{ model.name }}
+                                    {% endif %}
+                                </th>
+                            </tr>
+                            </tr>
+                            <th>{% trans 'Action' %}</th>
+                            <th colspan="2">{% trans 'Item' %}</th>
+                            </tr>
+                            </thead>
+
+
+                            {% for entry in model_log %}
+                                <tr>
+                                    <td>
+                                        <i class="{% if entry.is_addition %}icon-plus{% endif %}{% if entry.is_change %}icon-pencil{% endif %}{% if entry.is_deletion %}icon-minus{% endif %}"></i>
+                                        <span class="hidden-phone hidden-tablet">{% if entry.is_addition %}
+                                            {% trans 'addition' %}{% endif %}{% if entry.is_change %}
+                                            {% trans 'change' %}{% endif %}{% if entry.is_deletion %}
+                                            {% trans 'deletion' %}{% endif %}</span></td>
+                                    <td colspan="2">
+                                        {% if entry.is_deletion or not entry.get_admin_url %}
+                                            {{ entry.object_repr }}
+                                        {% else %}
+                                            <a href="{{ entry.get_admin_url }}">
+                                                {{ entry.object_repr }}
+                                            </a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+
+                            <tr>
+                                <th>{% trans 'Actions' %}</th>
+                                {% if model.add_url %}
+                                    <td><a href="{{ model.add_url }}"><i class="icon-plus"></i> {% trans 'Add' %}</a>
+                                    </td>
+                                {% else %}
+                                    <td>&nbsp;</td>
+                                {% endif %}
+
+                                {% if model.admin_url %}
+                                    <td><a href="{{ model.admin_url }}"><i class="icon-pencil"></i> {% trans 'Change' %}
+                                    </a></td>
+                                {% else %}
+                                    <td>&nbsp;</td>
+                                {% endif %}
+
+                            </tr>
+
+                        </table>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        {% endfor %}
+    {% else %}
+        {% if not app_list and not dashboards %}
+            <p>{% trans "You don't have permission to edit anything." %}</p>
+        {% else %}
+            {% for dash in dashboards %}
+
+                <div class="module {% if dash.reports %} span8 {% else %} span4{% endif %}">
+                    <table summary="{% blocktrans with title=dash.title %}Last changes on {{ title }} application.{% endblocktrans %}"
+                           class="table table-striped table-bordered">
+                        <thead>
+                        <tr>
+                            <th class="alignCenter" {% if not dash.reports %}colspan="2"{% else %}colspan="3"{% endif %}>
+                                {% if not dash.admin_url %}
+                                    <span>
+                                        <i class="icon-folder-open"></i>
+                                        {% blocktrans with title=dash.title %}{{ title }}{% endblocktrans %}
+                                    </span>
+                                {% else %}
+                                <a href="{{ dash.admin_url }}">
+                                    <i class="icon-folder-open"></i>
+                                    {% blocktrans with title=dash.title %}{{ title }}{% endblocktrans %}
+                                </a>
+                                {% endif %}
+                                {% if dash.model %}
+                                    {% if dash.model.admin_url %}
+                                        - <a href="{{ dash.model.admin_url }}">{{ dash.model.name }}</a>
+                                    {% else %}
+                                        - {{ dash.model.name }}
+                                    {% endif %}
+                                {% endif %}
+                                <a class="pull-right" href="{{ dash.admin_url }}">
+                                    Mais
+                                </a>
+                            </th>
+                        </tr>
+                        </tr>
+                        </thead>
+
+                        {% for info in dash.infos %}
+                            <tr>
+                                <td>
+                                    <i class="icon-info-sign"></i>
+                                    <small><strong>{{ info.name }}</strong>:</small>
+                                </td>
+                                <td>
+                                    <small>{{ info.value }}</small>
+                                </td>
+                                {% if forloop.first and dash.reports%}
+                                    <td rowspan="{{ forloop.revcounter }}" class="dash-reports">
+                                        <div class="tabbable"> <!-- Only required for left/right tabs -->
+                                            <ul class="nav nav-tabs">
+                                                {% for r in dash.reports %}
+                                                <li class="{% if forloop.first %}active{% endif %}">
+                                                    <a href="#tab{{ forloop.counter }}" data-toggle="tab" style="border:none; border-right:1px solid #DDD;border-bottom:1px solid #DDD"><strong style="font-size: 13px;">{{ r.title }}</strong></a>
+                                                </li>
+                                                {% endfor %}
+                                            </ul>
+                                            <div class="tab-content">
+                                                {% for r in dash.reports %}
+                                                <div class="tab-pane {% if forloop.first %}active{% endif %}" id="tab{{ forloop.counter }}">
+                                                    {{ r.html_output|safe }}
+                                                </div>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    </td>
+                                {% endif %}
+                            </tr>
+                        {% endfor %}
+
+                    </table>
+                </div>
+
+            {% endfor %}
+        {% endif %}
+    {% endif %}
+{#</div>#}
+{#</div>#}
+{% endblock %}
+
+{% block sidebar %}
+
+{% endblock %}

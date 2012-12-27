@@ -1,0 +1,49 @@
+<fieldset class="module aligned {{ fieldset.classes }}">
+{#    {% if fieldset.name %}<h2>{{ fieldset.name }}</h2>{% endif %}#}
+    {% if fieldset.name %}<legend>{{ fieldset.name }}</legend>{% endif %}
+    {% if fieldset.description %}
+        <div class="description">{{ fieldset.description|safe }}</div>
+    {% endif %}
+
+
+
+    {% for line in fieldset %}
+        <div class="control-group{% if line.fields|length_is:'1' and line.errors %} error{% endif %}{% for field in line %}{% if field.field.name %} field-{{ field.field.name }}{% endif %}{% endfor %}">
+            {% if line.fields|length_is:'1' %}
+                <p class="text-error">{{ line.errors|striptags }}</p>
+             {% endif %}
+            {% for field in line %}
+                <div{% if not line.fields|length_is:'1' %} class="field-box{% if field.field.name %} field-{{ field.field.name }}{% endif %}{% if not field.is_readonly and field.errors %} errors{% endif %}"{% endif %}>
+                    {% if not line.fields|length_is:'1' and not field.is_readonly %}
+                        <p class="text-error">{{ field.errors|striptags }}</p>
+                    {% endif %}
+
+                    {% if field.is_checkbox %}
+                        <div class="controls">
+                            <label class="checkbox inline">
+    {#                            {{ field.field }}{{ field.label_tag }}#}
+                                {{ field.field }}<strong>{{ field.field.label }}</strong>
+                            </label>
+                        </div>
+                    {% else %}
+                        <label class="control-label" for="{{ field.field.html_name }}">{% if field.field.field.required %}<strong>{% endif %}{{ field.field.label}}{% if field.field.field.required %}</strong>{% endif %}</label>
+                        <div class="controls">
+                        {% if field.is_readonly %}
+                            <span class="input-xlarge uneditable-input">{{ field.contents }}</span>
+                            {% if field.field.help_text %}
+                                <span class="help-inline">{{ field.field.help_text|safe }}</span>
+                            {% endif %}
+                        {% else %}
+                            {{ field.field }}
+                            {% if field.field.help_text %}
+                                <span class="help-inline">{{ field.field.help_text|safe }}</span>
+                            {% endif %}
+                        {% endif %}
+                        </div>
+                    {% endif %}
+
+                </div>
+            {% endfor %}
+        </div>
+    {% endfor %}
+</fieldset>

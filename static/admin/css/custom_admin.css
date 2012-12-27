@@ -1,0 +1,13 @@
+.results input[type="radio"],
+.results input[type="checkbox"]{
+    margin:0;
+}
+
+.justify{
+    text-align: justify;
+}
+
+.results .action-checkbox-column{
+    width: 18px;
+    text-align: center;
+}

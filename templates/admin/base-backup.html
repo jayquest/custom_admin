@@ -1,0 +1,163 @@
+{% load admin_static i18n %}{% load url from future %}<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE|default:"en-us" }}" {% if LANGUAGE_BIDI %}dir="rtl"{% endif %}>
+<head>
+<title>{% block title %}{% endblock %}</title>
+<link rel="stylesheet" type="text/css" href="{% block stylesheet %}{% static "admin/css/bootstrap-custum.css.css" %}{% endblock %}" />
+{% block extrastyle %}{% endblock %}
+<!--[if lte IE 7]><link rel="stylesheet" type="text/css" href="{% block stylesheet_ie %}{% static "admin/css/ie.css" %}{% endblock %}" /><![endif]-->
+{% if LANGUAGE_BIDI %}<link rel="stylesheet" type="text/css" href="{% block stylesheet_rtl %}{% static "admin/css/rtl.css" %}{% endblock %}" />{% endif %}
+<script type="text/javascript">window.__admin_media_prefix__ = "{% filter escapejs %}{% static "admin/" %}{% endfilter %}";</script>
+<script type="text/javascript" src="{% static 'admin/js/jquery.js' %}"></script>
+{% block extrahead %}{% endblock %}
+{% block blockbots %}<meta name="robots" content="NONE,NOARCHIVE" />{% endblock %}
+</head>
+
+
+<body class="{% if is_popup %}popup {% endif %}{% block bodyclass %}{% endblock %}">
+
+<!-- Container -->
+<div id="container">
+
+    {% if not is_popup %}
+    <!-- Header -->
+    <div id="header">
+        <div id="branding">
+        {% block branding %}{% endblock %}
+        </div>
+        {% if user.is_active and user.is_staff %}
+        <div id="user-tools">
+            <div class="user-name"><img src="{{STATIC_URL}}{% firstof user.image 'admin/img/user.png' %}"/><span>{% filter force_escape %}{% firstof user.first_name  user.username %}{% endfilter %}</span></div>
+            <div class="user-links">
+            {% block userlinks %}
+                {% url 'django-admindocs-docroot' as docsroot %}                
+                {% if docsroot %}
+                    <a href="{{ docsroot }}" alt="{% trans 'Documentation' %}"><img src="{% static 'admin/img/documentation.png' %}"/></a>
+                {% endif %}
+                <a href="{% url 'admin:password_change' %}" alt="{% trans 'Change password' %}"><img src="{% static 'admin/img/password.png' %}"/></a>                
+                <a href="{% url 'admin:logout' %}" alt="{% trans 'Log out' %}" ><img src="{% static 'admin/img/logout.png' %}"/></a>
+            {% endblock %}
+            </div>
+        </div>
+        {% endif %}
+        {% block nav-global %}{% endblock %}
+    </div>
+    <!-- END Header -->
+    {% block breadcrumbs %}
+    <div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+    {% if title %} &rsaquo; {{ title }}{% endif %}
+    </div>
+    {% endblock %}
+    {% endif %}
+
+    {% block messages %}
+        {% if messages %}
+        <ul class="messagelist">{% for message in messages %}
+          <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}</ul>
+        {% endif %}
+    {% endblock messages %}
+	
+	{% block nav-left %}
+        {% if not is_popup %}
+            {% if all_app_list %}
+            <script>
+                    $(document).ready(function(){
+                        $('div #nav-left ul li.application .icon').fadeOut(100);
+
+
+                        //initialize icons
+                        refreshIcons();
+
+                        // show and hide
+                        $('div #nav-left ul li.application.enabled li.model').show();
+                        $('div #nav-left ul li.application.disabled li.model').hide();
+
+                        $("div #nav-left ul li.application p").click(function(){
+                            $(this).parent().children("ul").children("li.model").toggle(200,refreshIcons);
+                            $(this).parent().toggleClass('enabled');
+                            $(this).parent().toggleClass('disabled');
+
+                        });
+
+                        $('div #nav-left').hover(hoverIn,hoverOut);
+
+                        function hoverIn(){
+                            $('div #nav-left ul li.application .icon').fadeIn(400);
+                        }
+                        function hoverOut(){
+                            $('div #nav-left ul li.application .icon').fadeOut(400);
+                        }
+
+                        function refreshIcons(){
+                            $('div #nav-left ul li.application.enabled .icon .open').show();
+                            $('div #nav-left ul li.application.enabled .icon .close').hide();
+                            $('div #nav-left ul li.application.disabled .icon .open').hide();
+                            $('div #nav-left ul li.application.disabled .icon .close').show();
+                        }
+                    });
+                </script>
+            <div id="nav-left">
+
+                <ul>
+                {% for app in all_app_list %}
+
+                    {% if current_app == 'admin' %}
+                    <li class="application {%if forloop.counter0 == 0 %} enabled {% else %} disabled {% endif %}">
+                    {% else %}
+                    <li class="application {% if current_app == app.name %} enabled {% else %} disabled {% endif %}">
+                    {% endif %}
+                        <span class="icon fadeOnHover">
+                            <img class="close" alt="Mostrar/ocultar pastas" title="Mostrar/ocultar modelos" src="{% static 'admin/img/clear.gif' %}">
+                            <img class="open" alt="Mostrar/ocultar pd:astas" title="Mostrar/ocultar modelos" src="{% static 'admin/img/clear.gif' %}">
+                        </span>
+
+                        <p {% if current_app == app.name %}class="current"{% endif %}>{% blocktrans with name=app.name %}{{ name }}{% endblocktrans %}</p>
+
+                        <ul>
+                        {% for model in app.models %}
+                            <li class="model">
+                                {% if title == model.title %}
+                                    {{ model.name }}
+                                {% else %}
+                                    <a {% if module_name|capfirst == model.name %}class="current"{% endif %} href="{% if model.admin_url %}{{ model.admin_url }}{% else %}'#'{% endif %}">{{ model.name }}</a>
+                                {% endif %}
+                                <ul>
+                                    {% if model.add_url %}
+                                    <li class="action"><a href="{{ model.add_url }}">{% trans 'Add' %}</a></li>
+                                    {% endif %}
+                                    {% if model.admin_url %}
+                                    <li class="action"><a href="{{ model.admin_url }}">{% trans 'Change' %}</a></li>
+                                    {% endif %}
+                                </ul>
+                            </li>
+                        {% endfor %}
+                        </ul>
+                    </li>
+                {% endfor %}
+                </ul>
+
+            </div>
+            {% endif %}
+        {% endif %}
+    {% endblock %}
+    <!-- Content -->
+    <div id="content" class="{% block coltype %}colM{% endblock %}">
+        {% block sidebar %}{% endblock %}
+        {% block pretitle %}{% endblock %}
+        {% block content_title %}{% if title %}<h1>{{ title }}</h1>{% endif %}{% endblock %}        
+        {% block content %}
+        {% block object-tools %}{% endblock %}
+        {{ content }}
+        {% endblock %}
+        
+        <br class="clear" />
+    </div>
+    <!-- END Content -->
+
+    {% block footer %}<div id="footer"></div>{% endblock %}
+</div>
+<!-- END Container -->
+
+</body>
+</html>

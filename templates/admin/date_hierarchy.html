@@ -1,0 +1,12 @@
+{% load i18n %}
+{% if show and choices %}
+    <h4>{% trans 'Date Hierarchy' %}</h4>
+    <div class="pagination">
+    <ul>
+    {% if back %}<li><a href="{{ back.link }}"><i class="icon-backward"></i>&nbsp;{{ back.title }}</a></li>{% endif %}
+    {% for choice in choices %}
+    <li> <a href="{{ choice.link }}">{{ choice.title }}</a></li>
+    {% endfor %}
+</ul>
+</div>
+{% endif %}

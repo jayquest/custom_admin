@@ -1,0 +1,96 @@
+{% load admin_static i18n %}{% load url from future %}<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE|default:"en-us" }}" {% if LANGUAGE_BIDI %}dir="rtl"{% endif %}
+      xmlns="http://www.w3.org/1999/html">
+<head>
+    <title>{% block title %}{% trans 'Login' %}{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Área administrativa do site">
+    <meta name="author" content="JWG | Soluções para Internet">
+    <link rel="stylesheet" type="text/css" href="{% block stylesheet %}{% static "admin/css/bootstrap-custum.css" %}{% endblock %}" />
+    <link rel="stylesheet" type="text/css" href="{% static "admin/css/bootstrap-responsive.css" %}" />
+    {% block extrastyle %}{% endblock %}
+    <!--[if lte IE 7]><link rel="stylesheet" type="text/css" href="{% block stylesheet_ie %}{% endblock %}" /><![endif]-->
+    <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+<![endif]-->
+    {#{% if LANGUAGE_BIDI %}<link rel="stylesheet" type="text/css" href="{% block stylesheet_rtl %}{% static "admin/css/rtl.css" %}{% endblock %}" />{% endif %}#}
+    <script type="text/javascript">window.__admin_media_prefix__ = "{% filter escapejs %}{% static "admin/" %}{% endfilter %}";</script>
+    <script src="http://code.jquery.com/jquery-latest.js"></script>
+    <script type="text/javascript" src="{% static 'admin/js/bootstrap.js' %}"></script>
+    {% block extrahead %}{% endblock %}
+    {% block blockbots %}<meta name="robots" content="NONE,NOARCHIVE" />{% endblock %}
+</head>
+
+
+<body class="login">
+
+{% if not is_popup %}
+    <!-- Header -->
+    <div id="header" class="navbar navbar-inverse navbar-static-top">
+        <div class="navbar-inner">
+            <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </a>
+
+            <a class="brand" href="{% url 'admin:index' %}"><img style="display: none;" src="{% block site-logo %}{% static 'admin/img/default-logo.png' %}{% endblock%}"/>Gerenciador Aletheia</a>
+
+        </div>
+    </div>
+    </div>
+    <!-- END Header -->
+
+{% endif %}
+    <div class="container-fluid">
+
+
+    <div class="login-container">
+        <form action="{{ app_path }}" method="post" id="login-form">{% csrf_token %}
+
+            <fieldset>
+                <legend>{% trans 'Please sign in' %}</legend>
+                {% if form.errors and not form.non_field_errors and not form.this_is_the_login_form.errors %}
+                    <div class="alert alert-error">
+                        <button type="button" class="close" data-dismiss="alert">×</button>
+                        {% blocktrans count counter=form.errors.items|length %}Please correct the error below.{% plural %}Please
+                            correct the errors below.{% endblocktrans %}
+                    </div>
+                {% endif %}
+
+                {% if form.non_field_errors or form.this_is_the_login_form.errors %}
+                    {% for error in form.non_field_errors|add:form.this_is_the_login_form.errors %}
+                        <div class="alert alert-error">
+                            <button type="button" class="close" data-dismiss="alert">×</button>
+                            {{ error }}
+                        </div>
+
+                    {% endfor %}
+                {% endif %}
+
+                <label for="id_username" class="required control-label">{% trans 'Username:' %}</label>
+                {{ form.username }}
+                {% if not form.this_is_the_login_form.errors %}<p class="text-error">{% for e in form.username.errors %}{{ e|escape }}{% if not forloop.last %} | {% endif %}{% endfor %}</p>{% endif %}
+
+                <label for="id_password" class="required control-label">{% trans 'Password:' %}</label>
+                {{ form.password }}
+                {% if not form.this_is_the_login_form.errors %}<p class="text-error">{% for e in form.password.errors %}{{ e|escape }}{% if not forloop.last %} | {% endif %}{% endfor %}</p>{% endif %}
+                <input type="hidden" name="this_is_the_login_form" value="1"/>
+                <input type="hidden" name="next" value="{{ next }}"/>
+                <p><input class="btn btn-primary" type="submit" value="{% trans 'Log in' %}"/></p>
+                {% url 'admin_password_reset' as password_reset_url %}
+                {% if password_reset_url %}
+                    <a href="{{ password_reset_url }}">{% trans 'Forgotten your password or username?' %}</a>
+                {% endif %}
+
+
+            </fieldset>
+        </form>
+
+        <script type="text/javascript">
+            document.getElementById('id_username').focus()
+        </script>
+    </div>
+    </div>
+</body>
+</html>
