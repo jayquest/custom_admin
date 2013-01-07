@@ -1,5 +1,6 @@
 #coding=utf-8
 from django.contrib.auth.admin import UserAdmin, GroupAdmin
+from django.templatetags.static import static
 
 __author__ = 'Johnny'
 
@@ -20,7 +21,7 @@ from django.utils.translation import ugettext as _
 from django.utils.translation import ungettext
 from django.utils.encoding import force_unicode
 from string import capitalize
-
+from django import forms
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth.forms import (UserCreationForm, UserChangeForm, AdminPasswordChangeForm)
@@ -466,6 +467,8 @@ class CustomModelAdmin(ModelAdmin):
             "admin/%s/object_history.html" % app_label,
             "admin/object_history.html"
         ], context, current_app=self.admin_site.name)
+
+
 
 class CustomUserAdmin(CustomModelAdmin):
     add_form_template = 'admin/auth/user/add_form.html'
