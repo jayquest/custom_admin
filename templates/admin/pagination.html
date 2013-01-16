@@ -1,10 +1,10 @@
-{% load admin_list %}
+{% load admin_list admin_paginator%}
 {% load i18n %}
 <div class="pagination">
 {% if pagination_required %}
 <ul>
 {% for i in page_range %}
-    <li>{% paginator_number cl i %}</li>
+    <li>{% my_paginator_number cl i%}</li>
 {% endfor %}
 </ul>
 {% endif %}

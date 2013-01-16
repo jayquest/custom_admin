@@ -12,8 +12,8 @@
 <script type="text/javascript">
 
     jQuery(document).ready(function(){
-        jQuery('input[type=text]').each(function(){
-            if(jQuery(this).hasClass('vDateField') || jQuery(this).hasClass('vTimeField')){
+        jQuery('.controls input[type=text]').each(function(){
+            if(jQuery(this).hasClass('vDateField') || jQuery(this).hasClass('vTimeField') || jQuery(this).hasClass('vIntegerField')){
                 jQuery(this).addClass('input-small')
             }
             else{
@@ -21,7 +21,11 @@
             }
         })
         jQuery('textarea').addClass('span6');
+
+
+        jQuery('.controls fieldset input[type=text]').removeClass('span6');
     });
+
 
 </script>
 

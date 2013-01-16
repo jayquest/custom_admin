@@ -11,3 +11,27 @@
     width: 18px;
     text-align: center;
 }
+
+.empty-form{
+    display:none;
+}
+
+td input.span6{
+    width: 100%;
+}
+
+select{
+    width: auto;
+}
+
+td.original p{
+    margin:0px;
+}
+
+fieldset table.table thead th{
+    padding:5px 4px 8px 4px;
+}
+
+fieldset table.table tr td{
+    padding:4px;
+}
