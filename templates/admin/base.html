@@ -100,7 +100,10 @@
                                                             <li class="action"><a href="{{ model.add_url }}">{% trans 'Add' %}</a></li>
                                                         {% endif %}
                                                         {% if model.admin_url %}
-                                                            <li class="action"><a href="{{ model.admin_url }}">{% trans 'Change' %}</a></li>
+                                                            <li class="action"><a href="{{ model.admin_url }}">Listar</a></li>
+                                                        {% endif %}
+                                                        {% if model.config_url %}
+                                                            <li class="action"><a href="{{ model.config_url }}">Configurações</a></li>
                                                         {% endif %}
                                                     </ul>
                                                 </li>

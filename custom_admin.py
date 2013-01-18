@@ -173,6 +173,11 @@ class CustomAdminSite(AdminSite):
                             model_dict['add_url'] = reverse('admin:%s_%s_add' % info, current_app=self.name)
                         except NoReverseMatch:
                             pass
+                    if perms.get('config', False):
+                        try:
+                            model_dict['config_url'] = reverse('admin:%s_%s_config' % info, current_app=self.name)
+                        except NoReverseMatch:
+                            pass
                     if app_label in app_dict:
                         app_dict[app_label]['models'].append(model_dict)
                     else:
