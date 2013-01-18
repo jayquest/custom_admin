@@ -15,7 +15,7 @@
          </th>
        {% endif %}
      {% endfor %}
-     {% if inline_admin_formset.formset.can_delete %}<th>{% trans "Delete?" %}</th>{% endif %}
+     {% if inline_admin_formset.formset.can_delete %}<th class="text-aling-center">{% trans "Delete?" %}</th>{% endif %}
      </tr></thead>
 
      <tbody>
@@ -57,7 +57,7 @@
           {% endfor %}
         {% endfor %}
         {% if inline_admin_formset.formset.can_delete %}
-          <td class="delete">{% if inline_admin_form.original %}{{ inline_admin_form.deletion_field.field }}{% endif %}</td>
+          <td class="delete text-aling-center">{% if inline_admin_form.original %}{{ inline_admin_form.deletion_field.field }}{% endif %}</td>
         {% endif %}
         </tr>
      {% endfor %}
