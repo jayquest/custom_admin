@@ -7,6 +7,14 @@
     text-align: justify;
 }
 
+td.text-aling-center , th.text-aling-center{
+    text-align: center;
+}
+
+.text-aling-center{
+    text-align: center;
+}
+
 .results .action-checkbox-column{
     width: 18px;
     text-align: center;
@@ -35,3 +43,11 @@ fieldset table.table thead th{
 fieldset table.table tr td{
     padding:4px;
 }
+
+fieldset table.table tr th{
+    width: auto;
+}
+
+fieldset table.table tr td input[type='text']{
+     width: 95%;
+ }
