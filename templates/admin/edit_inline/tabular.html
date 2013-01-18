@@ -1,4 +1,4 @@
-{% load i18n admin_static admin_modify %}
+{% load i18n admin_static admin_modify form_helper %}
 <div class="control-group" id="{{ inline_admin_formset.formset.prefix }}-group">
   <label class="control-label">{{ inline_admin_formset.opts.verbose_name_plural|capfirst }}</label>
   <div class="controls">
@@ -10,12 +10,12 @@
      <thead><tr>
      {% for field in inline_admin_formset.fields %}
        {% if not field.widget.is_hidden %}
-         <th{% if forloop.first %} colspan="2"{% endif %}{% if field.required %} class="required"{% endif %}>{{ field.label|capfirst }}
+         <th {% if forloop.first %} colspan="2"{% endif %}{% if field.required %} class="required {% if field|field_widget == 'CheckboxInput' %}text-align-center{% endif %}"{% else %}{% if field|field_widget == 'CheckboxInput'%}class="text-align-center"{% endif %}{% endif %}>{{ field.label|capfirst }}
          {% if field.help_text %}&nbsp;<img src="{% static "admin/img/icon-unknown.gif" %}" class="help help-tooltip" width="10" height="10" alt="({{ field.help_text|striptags }})" title="{{ field.help_text|striptags }}" />{% endif %}
          </th>
        {% endif %}
      {% endfor %}
-     {% if inline_admin_formset.formset.can_delete %}<th class="text-aling-center">{% trans "Delete?" %}</th>{% endif %}
+     {% if inline_admin_formset.formset.can_delete %}<th class="text-align-center">{% trans "Delete?" %}</th>{% endif %}
      </tr></thead>
 
      <tbody>
@@ -45,7 +45,7 @@
         {% for fieldset in inline_admin_form %}
           {% for line in fieldset %}
             {% for field in line %}
-              <td{% if field.field.name %} class="field-{{ field.field.name }}"{% endif %}>
+              <td{% if field.field.name %} class="field-{{ field.field.name }} {% if field.is_checkbox %}text-align-center{% endif %}"{% else %}{% if field.is_checkbox %}class="text-align-center"{% endif %}{% endif %}>
               {% if field.is_readonly %}
                   <p>{{ field.contents }}</p>
               {% else %}
@@ -57,7 +57,7 @@
           {% endfor %}
         {% endfor %}
         {% if inline_admin_formset.formset.can_delete %}
-          <td class="delete text-aling-center">{% if inline_admin_form.original %}{{ inline_admin_form.deletion_field.field }}{% endif %}</td>
+          <td class="delete text-align-center">{% if inline_admin_form.original %}{{ inline_admin_form.deletion_field.field }}{% endif %}</td>
         {% endif %}
         </tr>
      {% endfor %}
